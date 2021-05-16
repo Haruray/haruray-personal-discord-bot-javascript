@@ -175,7 +175,7 @@ client.on('message', async message =>
 		//Mau berapa detik spamnya
 		try{
 			const everyWhatSecond = Number(splittedMessage[1]);
-			if (everyWhatSecond < 1){
+			if (everyWhatSecond < 1 || isNaN(everyWhatSecond)){
 				message.channel.send("no.");
 				return;
 			}
