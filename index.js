@@ -168,18 +168,24 @@ client.on('message', async message =>
 	else if (message.content.startsWith(`${prefix}spam`)) {
 		const author = message.author.id;
 		const splittedMessage = message.content.split(' ');
-		if (splittedMessage.length != 3){
+		if (splittedMessage.length < 2){
 			message.channel.send("Invalid arguments, cunt");
+			return;
 		}
 		//Mau berapa detik spamnya
 		try{
 			const everyWhatSecond = Number(splittedMessage[1]);
+			if (everyWhatSecond < 1){
+				message.channel.send("no.");
+				return;
+			}
 			const msg = message.content.slice(splittedMessage[0].length + splittedMessage[1].length + 2);
 			spam = setInterval(function(){
 				message.channel.send(msg);
 			},1000*everyWhatSecond);
 		}catch(e){
 			message.channel.send("Invalid arguments, cunt");
+			return;
 		}
 	}
 	else if (message.content.startsWith(`${prefix}fuckoff`)){
