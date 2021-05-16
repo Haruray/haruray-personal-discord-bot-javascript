@@ -179,6 +179,9 @@ client.on('message', async message =>
 				message.channel.send("no.");
 				return;
 			}
+			else if (everyWhatSecond > 3600){
+				everyWhatSecond = 3599;
+			}
 			const msg = message.content.slice(splittedMessage[0].length + splittedMessage[1].length + 2);
 			spam = setInterval(function(){
 				message.channel.send(msg);
