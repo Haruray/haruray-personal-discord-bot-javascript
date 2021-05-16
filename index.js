@@ -249,7 +249,7 @@ client.on('message', async message =>
 			return;
 		}
 		
-		if (image.width > 100 && image.height > 100){
+		if (image.width > 300 && image.height > 300){
 			let canvas = Canvas.createCanvas(image.width, image.height);
 			let ctx = canvas.getContext('2d');
 			
