@@ -1,15 +1,20 @@
 const Discord = require('discord.js');
 const Canvas = require('canvas');
 const {prefix, token, userID, guildID, channelID} = require('./config.json');
-const client = new Discord.Client();
-
+//src : https://stackoverflow.com/questions/64559390/none-of-my-discord-js-guildmember-events-are-emitting-my-user-caches-are-basica
+//src : https://stackoverflow.com/questions/65042476/guild-members-timeout-members-didnt-arrive-in-time
+const intents = new Discord.Intents([
+    Discord.Intents.NON_PRIVILEGED, // include all non-privileged intents, would be better to specify which ones you actually need
+    "GUILD_MEMBERS", // lets you request guild members (i.e. fixes the issue)
+]);
+const client = new Discord.Client({ ws: { intents } });
 let spam = null; //for spam command
 let upperTextOffset = 0; //buat gambar
 let bottomTextOffset = -10; //buat gambar
 
 client.once('ready', () => {
 	console.log('Ready!');
-	client.user.setActivity('your mom',{type : 'LISTENING'});
+	client.user.setActivity('your mom',{type : 'PLAYING'});
 });
 
 //FUNCTIONS
@@ -93,12 +98,7 @@ client.on('ready', () => {
 			.setColor('#dc3d4b');
 
 			if (diffDays > 0 ){
-				if (firstTime){
-					guild.channels.cache.get(channelID).send(`<@${userID}> will be unbanned from valorant in ${diffDays} days`);
-					guild.channels.cache.get(channelID).send(reminderEmbed);
-					firstTime = false;
-				}
-				else if (today.getHours()>=8 && today.getHours <=10){
+				if (today.getHours()>=1 && today.getHours <=2){
 					guild.channels.cache.get(channelID).send(`<@${userID}> will be unbanned from valorant in ${diffDays} days`);
 					guild.channels.cache.get(channelID).send(reminderEmbed);
 				}
@@ -142,7 +142,7 @@ client.on('message', async message =>
 				{name: "jk uwu", value : ":D" },
 				{name: "ping", value:"just pinging, y'know?"},
 				{name: "caption [upper text] | [bottom text]", value: "captioning an image"},
-				{name: "setUpperOffset [number]", value:"actually to set top margin for upper text. Idk 'offset' seems more cool."},
+				{name: "setUpperOffset [number]", value:"actually to set top margin for upper text."},
 				{name: "setBottomOffset [number]", value:"same with previous command but with bottom text."},
 				{name: "resetOffset", value:"reset offset to default value"},
 				{name: "spam [second] [something]", value:"spam [something] every [second]."},
@@ -284,14 +284,14 @@ client.on('message', async message =>
 	else if (message.content.startsWith(`${prefix}setUpperOffset`)){
 		let arg = message.content.split(" ");
 		if (arg.length == 2){
-			try{
-				let newOffset = Number(arg[1]);
-				upperTextOffset = newOffset;
-				message.channel.send(`Upper text offset is changed to ${newOffset}`);
-			}
-			catch(e){
+			let newOffset = Number(arg[1]);
+			if (isNaN(newOffset)){
 				message.channel.send("Give me a number, you cunt.");
+				return;
 			}
+			upperTextOffset = newOffset;
+			message.channel.send(`Upper text offset is changed to ${newOffset}`);
+			
 		}
 		else{
 			message.channel.send("Ok? Invalid arguments?");
@@ -301,14 +301,12 @@ client.on('message', async message =>
 	else if (message.content.startsWith(`${prefix}setBottomOffset`)){
 		let arg = message.content.split(" ");
 		if (arg.length == 2){
-			try{
-				let newOffset = Number(arg[1]);
-				bottomTextOffset = newOffset;
-				message.channel.send(`Bottom text offset is changed to ${newOffset}`);
-			}
-			catch(e){
+			let newOffset = Number(arg[1]);
+			if (isNaN(newOffset)){
 				message.channel.send("Give me a number, you cunt.");
 			}
+			bottomTextOffset = newOffset;
+			message.channel.send(`Bottom text offset is changed to ${newOffset}`);
 		}
 		else{
 			message.channel.send("Ok? Invalid arguments?");
@@ -331,6 +329,18 @@ client.on('message', async message =>
 			message.channel.send("?");
 		}
 			
+	}
+
+	else if (message.content.startsWith(`@someone`)){
+		let arg = message.content.split(" ");
+		if (arg.length == 1){
+			let membersList = [];
+			const list = message.guild;
+			(await list.members.fetch()).forEach(e => membersList.push(e.user.id));
+			let randomChoice = Math.floor(Math.random() * membersList.length);
+			message.delete();
+			message.channel.send(`<@${membersList[randomChoice]}>`);
+		}	
 	}
 
 })
